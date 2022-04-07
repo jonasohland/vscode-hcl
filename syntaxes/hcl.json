@@ -3,8 +3,6 @@
     "scopeName": "source.hcl",
     "comment": "HashiCorp Configuration Language",
     "fileTypes": [
-        "tf",
-        "tfvars",
         "nomad",
         "hcl",
         "appfile"
@@ -95,7 +93,8 @@
                         { "include": "#variable-type-decimal" },
                         { "include": "#variable-type-constant" },
                         { "include": "#variable-type-array" },
-                        { "include": "#variable-type-map" }
+                        { "include": "#variable-type-map" },
+                        { "include": "#variable-type-reference" }
                     ]
                 }
             ]
@@ -142,8 +141,7 @@
                 {
                     "match": "\\b([\\w-]+)((\\.[\\w-]+)*)\\b",
                     "captures": {
-                        "1": { "name": "storage.modifier.hcl" },
-                        "2": { "name": "entity.name.type.hcl" }
+                        "0": { "name": "variable.parameter.hcl" }
                     }
                 }
             ]
@@ -165,6 +163,16 @@
                 }
             ]
         },
+        "variable-type-reference": {
+            "patterns": [
+                {
+                    "match": "\\b([\\w-]+)((\\.[\\w-]+)*)\\b",
+                    "captures": {
+                        "0": { "name": "variable.parameter.hcl" }
+                    }
+                }
+            ]
+        },
         "variable-type-map" : {
             "patterns": [
                 {
@@ -172,20 +180,42 @@
                     "end": "\\}",
                     "patterns" : [
                         {
-                            "begin": "(\"[\\w\\s\\.-]+\")\\s*(:)",
+                            "begin": "([\\w\\s\\.-]+)\\s*(:|=)",
                             "beginCaptures": {
-                                "1": { "name": "string.quoted.double.hcl" },
-                                "2": { "name": "keyword.operator.hcl" }              
+                                "1": { "name": "variable.parameter.hcl" }
                             },
                             "end": "(?<!\\2)\\s*($|(?=\\}))",
                             "endCaptures" : {
-                                "0": { "name": "keyword.operator.hcl" }  
+                                "1": { "name": "variable.parameter.hcl" }
                             },
                             "patterns": [
                                 { "include": "#variable-type-decimal" },
                                 { "include": "#variable-type-hexadecimal" },
                                 { "include": "#variable-type-constant" },
                                 { "include": "#variable-type-string" },
+                                { "include": "#variable-type-reference" },
+                                { "include": "#variable-type-map" },
+                                { 
+                                    "match": "\\s*,\\s*"
+                                }
+                            ]
+                        },
+                        {
+                            "begin": "(\"?[\\w\\s\\.-]+\"?)\\s*(:|=)",
+                            "beginCaptures": {
+                                "1": { "name": "string.quoted.double.hcl" }     
+                            },
+                            "end": "(?<!\\2)\\s*($|(?=\\}))",
+                            "endCaptures" : {
+                                "1": { "name": "string.quoted.double.hcl" }  
+                            },
+                            "patterns": [
+                                { "include": "#variable-type-decimal" },
+                                { "include": "#variable-type-hexadecimal" },
+                                { "include": "#variable-type-constant" },
+                                { "include": "#variable-type-string" },
+                                { "include": "#variable-type-reference" },
+                                { "include": "#variable-type-map" },
                                 { 
                                     "match": "\\s*,\\s*"
                                 }
@@ -222,7 +252,7 @@
                 {
                     "match": "\\b(true|false|yes|no|on|off)\\b",
                     "captures": {
-                        "0": { "name": "constant.numeric.hcl" }
+                        "0": { "name": "constant.language.hcl" }
                     }
                 }
             ]
