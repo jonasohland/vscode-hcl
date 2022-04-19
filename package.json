@@ -28,7 +28,7 @@
 		"languages": [{
 			"id": "hcl",
 			"aliases": ["HCL", "hcl"],
-			"extensions": [".tf",".tfvars",".nomad", ".hcl", "Appfile"],
+			"extensions": [".nomad", ".hcl", "Appfile"],
             "configuration": "./hcl.configuration.json"
 		}],
 		"grammars": [{
